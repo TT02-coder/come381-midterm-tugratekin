@@ -1,0 +1,67 @@
+===================================================================
+COME381 - Veritabanı Yönetim Sistemleri
+Ödev 1 & Ödev 2: Kısıtlama İhlal Testleri Çıktı Dosyası (violations_output.txt)
+Öğrenci: Tuğra Tekin (202502009055)
+===================================================================
+
+[TEST 1: NOT NULL Kısıtlaması İhlali]
+Sorgu:
+INSERT INTO Musteriler (musteri_id, ad, soyad, eposta) 
+VALUES (101, NULL, 'Yılmaz', 'ahmet@example.com');
+
+Çıktı:
+ERROR:  null value in column "ad" of relation "musteriler" violates not-null constraint
+DETAIL:  Failing row contains (101, null, Yılmaz, ahmet@example.com).
+SQL state: 23502
+
+-------------------------------------------------------------------
+
+[TEST 2: UNIQUE (Eşsizlik) Kısıtlaması İhlali]
+Sorgu:
+INSERT INTO Musteriler (musteri_id, ad, soyad, eposta) 
+VALUES (102, 'Mehmet', 'Kaya', 'ahmet@example.com');
+
+Çıktı:
+ERROR:  duplicate key value violates unique constraint "musteriler_eposta_key"
+DETAIL:  Key (eposta)=(ahmet@example.com) already exists.
+SQL state: 23505
+
+-------------------------------------------------------------------
+
+[TEST 3: CHECK Kısıtlaması İhlali - Negatif veya Geçersiz Değer]
+Sorgu:
+INSERT INTO Urunler (urun_id, urun_adi, fiyat, stok_miktari) 
+VALUES (501, 'Kablosuz Kulaklık', -150.00, 10);
+
+Çıktı:
+ERROR:  new row for relation "urunler" violates check constraint "check_fiyat_pozitif"
+DETAIL:  Failing row contains (501, Kablosuz Kulaklık, -150.00, 10).
+SQL state: 23514
+
+-------------------------------------------------------------------
+
+[TEST 4: FOREIGN KEY (Yabancı Anahtar) Kısıtlaması İhlali]
+Sorgu:
+INSERT INTO Siparisler (siparis_id, musteri_id, siparis_tarihi) 
+VALUES (9001, 99999, '2026-10-21');
+
+Çıktı:
+ERROR:  insert or update on table "siparisler" violates foreign key constraint "fk_siparis_musteri"
+DETAIL:  Key (musteri_id)=(99999) is not present in table "musteriler".
+SQL state: 23503
+
+-------------------------------------------------------------------
+
+[TEST 5: ON DELETE RESTRICT / CASCADE Testi]
+Sorgu:
+DELETE FROM Musteriler WHERE musteri_id = 1;
+
+Çıktı:
+ERROR:  update or delete on table "musteriler" violates foreign key constraint "fk_siparis_musteri" on table "siparisler"
+DETAIL:  Key (musteri_id)=(1) is still referenced from table "siparisler".
+SQL state: 23503
+
+===================================================================
+Tüm kısıtlama ihlal testleri başarıyla gerçekleştirilmiş ve veritabanı 
+bütünlük kurallarının (Integrity Constraints) aktif çalıştığı doğrulanmıştır.
+===================================================================
