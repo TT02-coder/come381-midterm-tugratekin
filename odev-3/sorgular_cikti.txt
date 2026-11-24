@@ -1,0 +1,91 @@
+﻿-- Q1: Fiyat? 50 TL'den y?ksek ?r?nleri pahal?dan ucuza s?rala.
+-- Ne i?e yarar: Kafedeki y?ksek fiyatl? ?r?nleri belirleyip men? fiyatland?rmas?n? ve ?r?n gelir potansiyelini h?zl?ca g?rmeyi sa?lar.
+SELECT name, price
+FROM product
+WHERE price > 50
+ORDER BY price DESC;
+      name       | price 
+-----------------+-------
+ So??uk Sandvi?? | 85.00
+ Brownie         | 75.00
+ Latte           | 65.00
+ Tost            | 60.00
+(4 rows)
+
+
+-- Q2: 'YBS' b?l?m?ndeki m??terilerin adlar?n? alfabetik s?rala.
+-- Ne i?e yarar: YBS b?l?m?ndeki m??teri listesini d?zenli ?ekilde ??kar?p duyuru veya kampanya planlamas?na yard?mc? olur.
+SELECT full_name
+FROM customer
+WHERE department = 'YBS'
+ORDER BY full_name ASC;
+  full_name   
+--------------
+ Can Arslan
+ Elif Y??lmaz
+ Tu??ra Tekin
+(3 rows)
+
+
+-- Q3: Her sipari?in numaras?n?, tarihini ve m??terinin ad?n? listele.
+-- Ne i?e yarar: Hangi sipari?in hangi tarihte ve kim taraf?ndan verildi?ini bir arada g?stererek sipari? takibini kolayla?t?r?r.
+SELECT o.order_id, o.order_date, c.full_name
+FROM orders o
+INNER JOIN customer c ON c.customer_id = o.customer_id
+ORDER BY o.order_id;
+ order_id | order_date |  full_name   
+----------+------------+--------------
+        1 | 2026-11-20 | Tu??ra Tekin
+        2 | 2026-11-22 | Tu??ra Tekin
+        3 | 2026-11-21 | Elif Y??lmaz
+        4 | 2026-11-22 | Mert Kaya
+(4 rows)
+
+
+-- Q4: Her sipari? kaleminin ?r?n ad?n? ve adedini listele.
+-- Ne i?e yarar: Sipari?lerde hangi ?r?nden ka?ar adet sat?ld???n? g?stererek ?r?n talebini ve stok t?ketimini izlemeye yarar.
+SELECT p.name, oi.quantity
+FROM order_item oi
+INNER JOIN product p ON p.product_id = oi.product_id
+ORDER BY oi.order_id, p.product_id;
+      name       | quantity 
+-----------------+----------
+ Filtre Kahve    |        1
+ Brownie         |        1
+ Latte           |        2
+ So??uk Sandvi?? |        1
+ Su              |        1
+ Tost            |        2
+(6 rows)
+
+
+-- Q5: Her m??terinin ka? sipari? verdi?ini m??teri ad?yla listele.
+-- Ne i?e yarar: M??terilerin sipari? s?kl???n? ortaya ??kararak d?zenli m??terileri ve hen?z sipari? vermeyenleri tespit etmeye yard?mc? olur.
+SELECT c.full_name, COUNT(o.order_id) AS siparis_sayisi
+FROM customer c
+LEFT JOIN orders o ON o.customer_id = c.customer_id
+GROUP BY c.customer_id, c.full_name
+ORDER BY c.customer_id;
+  full_name   | siparis_sayisi 
+--------------+----------------
+ Tu??ra Tekin |              2
+ Elif Y??lmaz |              1
+ Mert Kaya    |              1
+ Zeynep Demir |              0
+ Can Arslan   |              0
+(5 rows)
+
+
+-- Q6: Her ?r?n kategorisinin ortalama fiyat?n? bul.
+-- Ne i?e yarar: Kategoriler aras?ndaki fiyat seviyesini kar??la?t?rarak men?deki ?r?n fiyatlar?n?n tutarl?l???n? kontrol etmeyi sa?lar.
+SELECT category, ROUND(AVG(price), 2) AS ortalama_fiyat
+FROM product
+GROUP BY category
+ORDER BY category;
+ category | ortalama_fiyat 
+----------+----------------
+ ????ecek |          41.67
+ Tatl??   |          75.00
+ Yiyecek  |          72.50
+(3 rows)
+
